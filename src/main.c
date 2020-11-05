@@ -1,3 +1,14 @@
+/**
+ * @file main.c
+ * @author Lucas Batista de Lemos (https://www.linkedin.com/in/lucasblemos/)
+ * @brief 
+ * @version 0.1
+ * @date 11-05-2020
+ * 
+ * @copyright Copyright (c) 2020
+ * 
+ */
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -7,7 +18,7 @@
 #include <time.h>
 
 /*01 - Estrutura do endereço*/
-typedef struct address
+typedef struct 
 {
 	char logradouro[50];
 	char complemento[50];
@@ -15,20 +26,22 @@ typedef struct address
 	char cidade[50];
 	char estado[50];
 	char cep[9];
+	int save;
 }address;
 
 /*02 - Estrutura da filial*/
-typedef struct branch
+typedef struct 
 {
 	int codigo;
 	char nome[50];
 	char descricao[50];
 	char cnpj[15];
+	int save;
 	address endereco;
 }branch;
 
 /*03 - Estrutura do usuário*/
-typedef struct user
+typedef struct 
 {
 	int codigo;
 	char nome[50];
@@ -39,26 +52,12 @@ typedef struct user
 	char senha[50];
 	char senha2[60];
 	char status[2];
+	int save;
 	address endereco;
-}user;
-
-/*03.1 - Estrutura do usuário*/
-typedef struct user_aux
-{
-	int codigo;
-	char nome[50];
-	char celular[12];
-	char email[100];
-	char cpf[12];
-	char usuario[50];
-	char senha[50];
-	char senha2[60];
-	char status[2];
-	address endereco;
-}user_aux;
+}user, user_aux, user_upd;
 
 /*04 - Estrutura do paciente*/
-typedef struct patient
+typedef struct 
 {
 	int codigo;
 	char nome[50];
@@ -66,11 +65,12 @@ typedef struct patient
 	char email[100];
 	char cpf[12];
 	char cpf_c[12];
+	int save;
 	address endereco;
 }patient;
 
 /*05 - Estrutura do medico*/
-typedef struct doctor
+typedef struct 
 {
 	int codigo;
 	char nome[50];
@@ -78,12 +78,13 @@ typedef struct doctor
 	char email[100];
 	char cpf[12];
 	char especialidade[50];
+	int save;
 	branch filial;
 	address endereco;
 }doctor;
 
 /*06 - Estrutura do agendamento*/
-typedef struct scheduling
+typedef struct  
 {
 	int codigo;
 	char descricao[50];
@@ -95,35 +96,23 @@ typedef struct scheduling
 	char periodo[50];	
 	char status[2];
 	int precovalor;
-}scheduling;
+	int save;
+}scheduling, scheduling_aux, scheduling_upd;
 
-/*06.1 - Estrutura do agendamento auxiliar*/
-typedef struct scheduling_aux
-{
-	int codigo;
-	char descricao[50];
-	patient paciente;
-	doctor medico;
-	branch filial;
-	char data[9];
-	char hora[5];
-	char periodo[50];	
-	char status[2];
-	int precovalor;
-}scheduling_aux;
-
-FILE * puser, * ppatient, * pdoctor, * pfilial, * pendereco, * plogin, * pagendamento;
+FILE * puser, * ppatient, * pdoctor, * pfilial, * pendereco, * plogin, * pagendamento, *temporario;
 
 /*MT MENU*/
 int  main					(void);
 int  main_principal			(void);
 void main_cadastro			(void);
 void main_consulta			(void);
+void main_delete			(void);
 
 /*MT MENU TELAS*/
 void menu_principal			(void);
 void menu_cadastros			(void);
 void menu_consultas			(void);
+void menu_delete			(void);
 
 /*MT CADASTRO TELAS*/
 void cad_usuario			(void);
@@ -139,11 +128,16 @@ int con_filial				(void);
 int con_medico				(void);
 int con_agendamento			(void);
 
+/*MT DELETAR TELAS*/
+void deletar_usuario		(void);
+void cancelar_agendamento	(void);
+
 /*MT FUNÇÕES*/
 int verifica_useradm		(void);
 int tela_login				(void);
 void tratamento_preco		(int* tpreco);
 void tratamento_desc50		(char* tdesc50, int tdesc50_size);
+void tratamento_estado		(char* testado, int testado_size);
 void tratamento_cpf			(char* tcpf, int tcpf_size);
 void tratamento_data		(char* tdata, int tdata_size);
 void tratamento_tdta		(char* tdta, int tdta_size);
@@ -163,7 +157,7 @@ void incrementa_id_agen		(int *IDinc_agen);
 /*-----------------------------------------------------------------------*/
 
 /*MENU PRINCIPAL*/
-int main(void)
+int main					(void)
 {
 	setlocale(LC_ALL, "Portuguese");
 	verifica_useradm();
@@ -172,7 +166,7 @@ int main(void)
 	return 0;
 }
 
-int main_principal(void)
+int main_principal			(void)
 {
 	/*---- ACESSO AOS MENU DE CADASTRO E CONSULTA ----*/
 	int scan_main;
@@ -187,10 +181,11 @@ int main_principal(void)
 		{
 		case 1 : main_cadastro();		break;
 		case 2 : main_consulta();		break;
-		case 3 : tela_login(); 			break;
-		case 4 : exit(0);
+		case 3 : main_delete();			break;
+		case 4 : tela_login(); 			break;
+		case 5 : exit(0);
 			break;
-		default : printf("\nMenu inexistente, tente novamente de 1 a 3.");  
+		default : printf("\nMenu inexistente, tente novamente de 1 a 5.");  
 		}
 
 	printf("\n\n");	
@@ -199,7 +194,7 @@ int main_principal(void)
 	return 0;
 }
 
-void main_cadastro(void)
+void main_cadastro			(void)
 {
 	int scan_cad;
 	scan_cad = 0;
@@ -218,13 +213,13 @@ void main_cadastro(void)
 		case 6 : main_principal();		break;
 		case 7 : tela_login(); 			break;
 		exit(0);
-    default : printf("Menu inexistente, tente de 1 a 7.");
+    	default : printf("Menu inexistente, tente de 1 a 7.");
 	}
 	printf("\n\n");
 	getchar();
 }
 
-void main_consulta(void)
+void main_consulta			(void)
 {
 	int scan_con;
 
@@ -250,10 +245,33 @@ void main_consulta(void)
 	getchar();
 }
 
+void main_delete			(void)
+{
+	int scan_con;
+
+	menu_delete();
+
+	printf("\nSelecione uma opcao e pressione ENTER: ");
+	scanf("%i", &scan_con);
+
+	switch (scan_con)
+	{
+		case 1 : cancelar_agendamento();break;
+		case 2 : deletar_usuario();		break;
+		case 3 : main_principal();		break;
+		case 4 : tela_login(); 			break;
+			exit(0);
+    	default : printf("Menu inexistente, tente de 1 a 4.");
+	}
+
+	printf("\n\n");
+	getchar();
+}
+
 /*-----------------------------------------------------------------------*/
 
 /*MENU TELAS*/
-void menu_principal(void)
+void menu_principal			(void)
 {
 	setlocale(LC_ALL,""); //Para acentuação
   	printf("\033[2J\033[1;1H");
@@ -268,13 +286,14 @@ void menu_principal(void)
 	printf("    |                                                    |\n");
 	printf("    |       [1] - Menu de cadastros                      |\n");
 	printf("    |       [2] - Menu de consultas                      |\n");
-	printf("    |       [3] - Logout                                 |\n");
-	printf("    |       [4] - Sair do Programa                       |\n");
+	printf("    |       [3] - Menu de delete                         |\n");
+	printf("    |       [4] - Logout                                 |\n");
+	printf("    |       [5] - Sair do Programa                       |\n");
 	printf("    |                                                    |\n");
 	printf("    |____________________________________________________|\n");
 }
 
-void menu_cadastros(void)
+void menu_cadastros			(void)
 {
 	setlocale(LC_ALL,""); //Para acentuação
 	printf("\033[2J\033[1;1H");
@@ -299,7 +318,7 @@ void menu_cadastros(void)
   
 }
 
-void menu_consultas(void)
+void menu_consultas			(void)
 {
 	setlocale(LC_ALL,""); //Para acentuação
 	printf("\033[2J\033[1;1H");
@@ -324,14 +343,36 @@ void menu_consultas(void)
 
 }
 
+void menu_delete			(void)
+{
+	setlocale(LC_ALL,""); //Para acentuação
+	printf("\033[2J\033[1;1H");
+
+	printf("	           ========   CLIMANAGER   ========\n\n");
+
+	printf("    .____________________________________________________.\n");
+	printf("    |                                                    |\n");
+	printf("    |                   Menu de delete	                 |\n");
+	printf("    |____________________________________________________|\n");
+	printf("    |                                                    |\n");
+	printf("    |                                                    |\n");
+	printf("    |       [1] - Cancelar agendamento                   |\n");
+	printf("    |       [2] - Deletar usuario                        |\n");
+	printf("    |       [3] - Voltar ao menu principal               |\n");
+	printf("    |       [4] - Logout                                 |\n");
+	printf("    |                                                    |\n");
+	printf("    |____________________________________________________|\n");
+
+}
+
 /*-----------------------------------------------------------------------*/
 
 /*CADASTRO TELAS*/
-void cad_usuario(void)
+void cad_usuario			(void)
 {
 	user cfuncionario = {'\0'};
 	//user_aux* cusuario_aux = calloc(1, sizeof(user_aux)* 1);
-
+	
 	int i, tam_msg;
 	char crip_msg[50];
 	
@@ -440,30 +481,30 @@ void cad_usuario(void)
 		{
 			printf("\n--------- Localizacao --------- \n");
 			
-			printf("\n\nEstado da Usuario: \n");
-			tratamento_desc50(cfuncionario.endereco.estado, 50);
+			printf("\n\nEstado do Usuario(XX): \n");
+			tratamento_estado(cfuncionario.endereco.estado, 2);
 			fseek(stdin, 0, SEEK_END);
 
-			printf("\n\nCidade da Usuario: \n");
+			printf("\n\nCidade do Usuario: \n");
 			tratamento_desc50(cfuncionario.endereco.cidade, 50);
 			fseek(stdin, 0, SEEK_END);
 
-			printf("\n\nBairro da Usuario: \n");
+			printf("\n\nBairro do Usuario: \n");
 			tratamento_desc50(cfuncionario.endereco.bairro, 50);
 			fseek(stdin, 0, SEEK_END);
 
-			printf("\n\nLogradouro da Usuario: \n");
+			printf("\n\nLogradouro do Usuario: \n");
 			tratamento_desc50(cfuncionario.endereco.logradouro, 50);
 			fseek(stdin, 0, SEEK_END);
 
-			printf("\n\nComplemento da Usuario: \n");
+			printf("\n\nComplemento do Usuario: \n");
 			tratamento_desc50(cfuncionario.endereco.complemento, 50);
 
-			printf("\n\nCEP da Usuario: \n");
+			printf("\n\nCEP do Usuario: \n");
 			tratamento_cep(cfuncionario.endereco.cep, 8);
 			fseek(stdin, 0, SEEK_END);
 
-			printf("\nUsuario cadastrado com sucessso!");
+			printf("\n\nUsuario cadastrado com sucesso! Tecle ENTER para voltar ao menu.");
 			break;
 		}	
 	}
@@ -493,6 +534,20 @@ void cad_usuario(void)
 		}
 	}
 
+	while(cfuncionario.save != 1 && 2)
+	{
+		printf("\n\nTecle [1] SALVAR esse cadastro ou [2] para CANCELAR este cadastro: ");
+		scanf("%i", &cfuncionario.save);
+		
+		switch (cfuncionario.save)
+		{
+			case 1 : break;	
+			case 2 : main_cadastro(); break;
+			default:printf("\nMenu inexistente, tente novamente [1] ou [2].");
+			
+		}
+	}
+
 	fprintf(puser, "%i\n", cfuncionario.codigo);
 	fprintf(puser, "%s\n", cfuncionario.nome);
 	fprintf(puser, "%s\n", cfuncionario.celular);
@@ -512,7 +567,7 @@ void cad_usuario(void)
 	main_cadastro();
 }
 
-void cad_paciente(void)
+void cad_paciente			(void)
 {
 	setlocale(LC_ALL, "Portuguese"); //Para acentuação
 
@@ -563,26 +618,26 @@ void cad_paciente(void)
 
 	printf("\n--------- Localizacao --------- \n");
 			
-	printf("\n\nEstado da paciente: \n");
-	tratamento_desc50(cpaciente.endereco.estado, 50);
+	printf("\n\nEstado do paciente(XX): \n");
+	tratamento_estado(cpaciente.endereco.estado, 2);
 	fseek(stdin, 0, SEEK_END);
 
-	printf("\n\nCidade da paciente: \n");
+	printf("\n\nCidade do paciente: \n");
 	tratamento_desc50(cpaciente.endereco.cidade, 50);
 	fseek(stdin, 0, SEEK_END);
 
-	printf("\n\nBairro da paciente: \n");
+	printf("\n\nBairro do paciente: \n");
 	tratamento_desc50(cpaciente.endereco.bairro, 50);
 	fseek(stdin, 0, SEEK_END);
 
-	printf("\n\nLogradouro da paciente: \n");
+	printf("\n\nLogradouro do paciente: \n");
 	tratamento_desc50(cpaciente.endereco.logradouro, 50);
 	fseek(stdin, 0, SEEK_END);
 
-	printf("\n\nComplemento da paciente: \n");
+	printf("\n\nComplemento do paciente: \n");
 	tratamento_desc50(cpaciente.endereco.complemento, 50);
 
-	printf("\n\nCEP da paciente: \n");
+	printf("\n\nCEP do paciente: \n");
 	tratamento_cep(cpaciente.endereco.cep, 8);
 	fseek(stdin, 0, SEEK_END);
 
@@ -603,6 +658,20 @@ void cad_paciente(void)
 		}
 	}
 
+	while(cpaciente.save != 1 && 2)
+	{
+		printf("\n\nTecle [1] SALVAR esse cadastro ou [2] para CANCELAR este cadastro: ");
+		scanf("%i", &cpaciente.save);
+
+		switch (cpaciente.save)
+	{
+		case 1 : break;	
+		case 2 : main_cadastro(); break;
+		default:printf("\nMenu inexistente, tente novamente [1] ou [2].");
+		
+	}
+	}
+
 	/*Incrementar mais um valor no código usuário*/
 	fprintf(ppatient, "%i\n", cpaciente.codigo);
 	fprintf(ppatient, "%s\n", cpaciente.nome);
@@ -617,12 +686,12 @@ void cad_paciente(void)
 	fprintf(ppatient, "%s\n", cpaciente.endereco.cep);
 	fclose(ppatient);
 
-	printf("\n\nPaciente cadastrado com sucessso!");
+	printf("\n\nPaciente cadastrado com sucesso! Tecle ENTER para voltar ao menu.");
 	getchar();
 	main_cadastro();
 }
 
-void cad_medico(void)
+void cad_medico				(void)
 {
 	setlocale(LC_ALL, "Portuguese"); //Para acentuação
 
@@ -682,26 +751,26 @@ void cad_medico(void)
 
 	printf("\n\n--------- Localizacao --------- \n");
 			
-	printf("\n\nEstado da medico: \n");
-	tratamento_desc50(cmedico.endereco.estado, 50);
+	printf("\n\nEstado do medico(XX): \n");
+	tratamento_estado(cmedico.endereco.estado, 2);
 	fseek(stdin, 0, SEEK_END);
 
-	printf("\n\nCidade da medico: \n");
+	printf("\n\nCidade do medico: \n");
 	tratamento_desc50(cmedico.endereco.cidade, 50);
 	fseek(stdin, 0, SEEK_END);
 
-	printf("\n\nBairro da medico: \n");
+	printf("\n\nBairro do medico: \n");
 	tratamento_desc50(cmedico.endereco.bairro, 50);
 	fseek(stdin, 0, SEEK_END);
 
-	printf("\n\nLogradouro da medico: \n");
+	printf("\n\nLogradouro do medico: \n");
 	tratamento_desc50(cmedico.endereco.logradouro, 50);
 	fseek(stdin, 0, SEEK_END);
 
-	printf("\n\nComplemento da medico: \n");
+	printf("\n\nComplemento do medico: \n");
 	tratamento_desc50(cmedico.endereco.complemento, 50);
 
-	printf("\n\nCEP da medico: \n");
+	printf("\n\nCEP do medico: \n");
 	tratamento_cep(cmedico.endereco.cep, 8);
 	fseek(stdin, 0, SEEK_END);
 
@@ -722,6 +791,20 @@ void cad_medico(void)
 		}
 	}
 	
+	while(cmedico.save != 1 && 2)
+	{
+		printf("\n\nTecle [1] SALVAR esse cadastro ou [2] para CANCELAR este cadastro: ");
+		scanf("%i", &cmedico.save);
+
+		switch (cmedico.save)
+	{
+		case 1 : break;	
+		case 2 : main_cadastro(); break;
+		default:printf("\nMenu inexistente, tente novamente [1] ou [2].");
+		
+	}
+	}
+
 	fprintf(pdoctor, "%i\n", cmedico.codigo);
 	fprintf(pdoctor, "%s\n", cmedico.nome);
 	fprintf(pdoctor, "%s\n", cmedico.celular);
@@ -737,12 +820,12 @@ void cad_medico(void)
 	fprintf(pdoctor, "%s\n", cmedico.endereco.cep);
 	fclose(pdoctor);
 
-	printf("\n\nMedico cadastrado com sucessso!");
+	printf("\n\nMedico cadastrado com sucesso! Tecle ENTER para voltar ao menu.");
 	getchar();
 	main_cadastro();
 }
 
-void cad_filial(void)
+void cad_filial				(void)
 {
 	setlocale(LC_ALL, "Portuguese"); //Para acentuação
 
@@ -790,8 +873,8 @@ void cad_filial(void)
 
 	printf("\n\n--------- Localizacao --------- \n");
 			
-	printf("\n\nEstado da filial: \n");
-	tratamento_desc50(cfilial.endereco.estado, 50);
+	printf("\n\nEstado da filial(XX): \n");
+	tratamento_estado(cfilial.endereco.estado, 2);
 	fseek(stdin, 0, SEEK_END);
 
 	printf("\n\nCidade da filial: \n");
@@ -830,6 +913,21 @@ void cad_filial(void)
 		}
 	}
 
+	while(cfilial.save != 1 && 2)
+	{
+		printf("\n\nTecle [1] SALVAR esse cadastro ou [2] para CANCELAR este cadastro: ");
+		scanf("%i", &cfilial.save);
+
+		switch (cfilial.save)
+		{
+			case 1 : break;	
+			case 2 : main_cadastro(); break;
+			default:printf("\nMenu inexistente, tente novamente [1] ou [2].");
+			getchar();
+			
+		}
+	}	
+
 	fprintf(pfilial, "%i\n", cfilial.codigo);
 	fprintf(pfilial, "%s\n", cfilial.nome);
 	fprintf(pfilial, "%s\n", cfilial.cnpj);
@@ -842,12 +940,12 @@ void cad_filial(void)
 	fprintf(pfilial, "%s\n", cfilial.endereco.cep);
 	fclose(pfilial);
 
-	printf("\n\nFilial cadastrada com sucessso!");
+	printf("\n\nFilial cadastrada com sucesso! Tecle ENTER para voltar ao menu.");
 	getchar();
 	main_cadastro();
 }
 
-void cad_agendamento(void)
+void cad_agendamento		(void)
 {
 	setlocale(LC_ALL, "Portuguese"); //Para acentuação
 
@@ -1093,6 +1191,19 @@ void cad_agendamento(void)
 		}
 	}
 
+	while(cagendamento.save != 1 && 2)
+	{
+		printf("\n\nTecle [1] SALVAR esse cadastro ou [2] para CANCELAR este cadastro: ");
+		scanf("%i", &cagendamento.save);
+
+		switch (cagendamento.save)
+		{
+			case 1 : break;	
+			case 2 : main_cadastro(); break;
+			default:printf("\nMenu inexistente, tente novamente [1] ou [2].");	
+		}
+	}
+
 	fprintf(pagendamento, "%i\n", cagendamento.codigo);
 	fprintf(pagendamento, "%s\n", cpaciente->cpf);
 	fprintf(pagendamento, "%s\n", cpaciente->nome);
@@ -1105,7 +1216,7 @@ void cad_agendamento(void)
 	fprintf(pagendamento, "%s\n", cagendamento.descricao);
 	fclose(pagendamento);
 
-	printf("\n\nAgendamento realizado com sucessso!");
+	printf("\n\nAgendamento realizado com sucesso! Tecle ENTER para voltar ao menu.");
 	getchar();
 	free(cfilial);
 	free(cmedico);
@@ -1116,7 +1227,7 @@ void cad_agendamento(void)
 /*-----------------------------------------------------------------------*/
 
 /*CONSULTA TELAS*/
-int con_usuario(void)
+int con_usuario				(void)
 {
 	puser = fopen("dados\\cad_funcionario.txt", "r");
 	if (puser == NULL) {
@@ -1190,7 +1301,7 @@ int con_usuario(void)
 	free(puser);
 }
 
-int con_paciente(void)
+int con_paciente			(void)
 {
 	ppatient = fopen("dados\\cad_paciente.txt", "r");
 	if (ppatient == NULL) {
@@ -1263,7 +1374,7 @@ int con_paciente(void)
 	main_consulta();
 }
 
-int con_medico(void)
+int con_medico				(void)
 {
 	pdoctor = fopen("dados\\cad_medico.txt", "r");
 	if (pdoctor == NULL) {
@@ -1336,7 +1447,7 @@ int con_medico(void)
 	main_consulta();
 }
 
-int con_filial(void)
+int con_filial				(void)
 {
 	pfilial = fopen("dados\\cad_filial.txt", "r");
 	if (pfilial == NULL) {
@@ -1409,7 +1520,7 @@ int con_filial(void)
 	main_consulta();
 }
 
-int con_agendamento(void)
+int con_agendamento			(void)
 {
 	pagendamento = fopen("dados\\cad_agendamento.txt", "r");
 	if (pagendamento == NULL) {
@@ -1485,8 +1596,245 @@ int con_agendamento(void)
 
 /*-----------------------------------------------------------------------*/
 
+/*EXCLUSÃO TELAS*/
+void deletar_usuario		(void)
+{
+    int test;
+	test = 0;
+	
+	user* cusuario = calloc(1, sizeof(user)* 1);
+	user_upd* cusuario_upd = calloc(1, sizeof(user_upd)* 1);
+
+    puser = fopen("dados\\cad_funcionario.txt", "r");
+	if (puser == NULL) {
+		fprintf(stderr, "\n\nErro ao abrir arquivo ou ainda nao foi realizado nenhum cadastro!");
+		
+		int verificaarq;
+		verificaarq = 0;
+		printf("\n\nTecle [1] para voltar ao menu principal ou [2] para sair do programa: ");
+		scanf("%i", &verificaarq);
+
+		switch (verificaarq)
+		{
+			case 1 : main_principal();	break;	
+			case 2 : exit(0);		
+			default:printf("\nMenu inexistente, tente novamente [1] ou [2].");
+		}
+	}
+    
+	temporario = fopen("dados\\temporario_user.txt", "w");
+	if (temporario == NULL) {
+		fprintf(stderr, "\n\nErro ao abrir arquivo ou ainda nao foi realizado nenhum cadastro!");
+		
+		int verificaarq;
+		verificaarq = 0;
+		printf("\n\nTecle [1] para voltar ao menu principal ou [2] para sair do programa: ");
+		scanf("%i", &verificaarq);
+
+		switch (verificaarq)
+		{
+			case 1 : main_principal();	break;	
+			case 2 : exit(0);		
+			default:printf("\nMenu inexistente, tente novamente [1] ou [2].");
+		}
+	}
+
+	printf("\033[2J\033[1;1H");
+	printf("DELETAR USUARIO\n\n");
+
+    printf("Para deletar um usuario, insira o CPF do usuario: ");
+    tratamento_cpf(cusuario_upd->cpf, 11);
+
+    while (fscanf(puser, "%d\n %[^\n] %[^\n] %[^\n] %[^\n] %[^\n] %[^\n] %[^\n] %[^\n] %[^\n] %[^\n] %[^\n] %[^\n]s", &cusuario->codigo, cusuario->nome, cusuario->celular, cusuario->email, cusuario->cpf, cusuario->usuario, cusuario->senha, cusuario->endereco.estado, cusuario->endereco.cidade, cusuario->endereco.bairro, cusuario->endereco.logradouro, cusuario->endereco.complemento, cusuario->endereco.cep)!=EOF)
+   	{
+        if(strcmp(cusuario->cpf, cusuario_upd->cpf) != 0)
+		{
+            fprintf(temporario, "%i\n", cusuario->codigo);
+			fprintf(temporario, "%s\n", cusuario->nome);
+			fprintf(temporario, "%s\n", cusuario->celular);
+			fprintf(temporario, "%s\n", cusuario->email);
+			fprintf(temporario, "%s\n", cusuario->cpf);
+			fprintf(temporario, "%s\n", cusuario->usuario);
+			fprintf(temporario, "%s\n", cusuario->senha);
+			fprintf(temporario, "%s\n", cusuario->endereco.estado);
+			fprintf(temporario, "%s\n", cusuario->endereco.cidade);
+			fprintf(temporario, "%s\n", cusuario->endereco.bairro);
+			fprintf(temporario, "%s\n", cusuario->endereco.logradouro);
+			fprintf(temporario, "%s\n", cusuario->endereco.complemento);
+			fprintf(temporario, "%s\n", cusuario->endereco.cep);
+		}
+		else
+		{
+			test++;
+			memset(cusuario->senha, 0, sizeof(cusuario->senha));
+			printf("\n\nCodigo: %i\nNome: %s\nCelular: %.2s-%.5s-%.4s\nE-mail: %s\nCPF: %.3s.%.3s.%.3s-%.2s\nUsuario no sistema: %s\nSenha: %s\nEstado: %s\nCidade: %s\nBairro: %s\nlogradouro: %s\nComplemento: %s\nCep: %.5s-%.3s\n", cusuario->codigo, cusuario->nome, cusuario->celular, cusuario->celular+2, cusuario->celular+7, cusuario->email, cusuario->cpf, cusuario->cpf+3, cusuario->cpf+6, cusuario->cpf+9, cusuario->usuario, cusuario->senha, cusuario->endereco.estado, cusuario->endereco.cidade, cusuario->endereco.bairro, cusuario->endereco.logradouro, cusuario->endereco.complemento, cusuario->endereco.cep, cusuario->endereco.cep+5);
+		}
+	}
+
+	while(cusuario->save != 1 && 2 && test == 0)
+	{
+		printf("\n\n\nNao ha registros com esse CPF!\n\n");
+		fclose(puser);
+		fclose(temporario);
+		printf("\n\nTecle [1] para tentar novamente ou [2] para VOLTAR ao menu de cadastro: ");
+		scanf("%i", &cusuario->save);
+
+		switch (cusuario->save)
+		{
+			case 1 : deletar_usuario(); break;	
+			case 2 : main_cadastro(); break;
+			default:printf("\nOpcao inexistente, tente novamente [1] ou [2].");	
+		}
+	}
+
+	while(cusuario->save != 1 && 2)
+	{
+		printf("\n\nTecle [1] para confirmar a EXCLUSAO desse usuario ou [2] para VOLTAR ao menu de cadastro: ");
+		scanf("%i", &cusuario->save);
+
+		switch (cusuario->save)
+		{
+			case 1 : break;	
+			case 2 : main_cadastro(); break;
+			default:printf("\nOpcao inexistente, tente novamente [1] ou [2].");	
+		}
+	
+		fclose(temporario);
+		fclose(puser);
+		
+		remove("dados\\cad_funcionario.txt");
+		int rem = 0;
+		rem = remove("dados\\cad_funcionario.txt");
+		if (rem == 0)
+		{
+			printf("O arquivo foi deletado com sucesso!\n");
+		}
+		else
+		{
+			perror("Nao foi possivel deletar o arquivo!");
+		}
+
+		rename("dados\\temporario_user.txt", "dados\\cad_funcionario.txt");
+
+		printf("Tecle ENTER para voltar ao menu anterior!");
+		getchar();
+		main_delete();
+	}			
+}
+
+void cancelar_agendamento	(void)
+{
+    int test;
+	test = 0;
+
+	scheduling* cagendamento = calloc(1, sizeof(scheduling)* 1);
+	scheduling_upd* cagendamento_upd = calloc(1, sizeof(scheduling_upd)* 1);
+
+    pagendamento = fopen("dados\\cad_agendamento.txt", "r");
+	if (pagendamento == NULL) {
+		fprintf(stderr, "\n\nErro ao abrir arquivo ou ainda nao foi realizado nenhum cadastro!");
+		
+		int verificaarq;
+		verificaarq = 0;
+		printf("\n\nTecle [1] para voltar ao menu principal ou [2] para sair do programa: ");
+		scanf("%i", &verificaarq);
+
+		switch (verificaarq)
+		{
+			case 1 : main_principal();	break;	
+			case 2 : exit(0);		
+			default:printf("\nMenu inexistente, tente novamente [1] ou [2].");
+		}
+	}
+    
+	temporario=fopen("dados\\temporario_agen.txt", "w");
+	if (temporario == NULL) {
+		fprintf(stderr, "\n\nErro ao abrir arquivo ou ainda nao foi realizado nenhum cadastro!");
+		
+		int verificaarq;
+		verificaarq = 0;
+		printf("\n\nTecle [1] para voltar ao menu principal ou [2] para sair do programa: ");
+		scanf("%i", &verificaarq);
+
+		switch (verificaarq)
+		{
+			case 1 : main_principal();	break;	
+			case 2 : exit(0);		
+			default:printf("\nMenu inexistente, tente novamente [1] ou [2].");
+		}
+	}
+
+	printf("\033[2J\033[1;1H");
+	printf("CANCELAR AGENDAMENTOS\n\n");
+
+    printf("Para cancelar um agendamento, insira o CPF do paciente: ");
+    tratamento_cpf(cagendamento_upd->paciente.cpf, 11);
+
+    while (fscanf(pagendamento, "%d\n %[^\n] %[^\n] %[^\n] %[^\n] %[^\n] %[^\n] %[^\n] %[^\n] %[^\n]s", &cagendamento->codigo, cagendamento->paciente.cpf, cagendamento->paciente.nome, cagendamento->medico.cpf, cagendamento->medico.nome, cagendamento->filial.cnpj, cagendamento->filial.nome, cagendamento->data, cagendamento->hora, cagendamento->descricao)!=EOF)
+   	{
+        if(strcmp(cagendamento->paciente.cpf, cagendamento_upd->paciente.cpf) != 0)
+		{
+            fprintf(temporario, "%i\n", cagendamento->codigo);
+			fprintf(temporario, "%s\n", cagendamento->paciente.cpf);
+			fprintf(temporario, "%s\n", cagendamento->paciente.nome);
+			fprintf(temporario, "%s\n", cagendamento->medico.cpf);
+			fprintf(temporario, "%s\n", cagendamento->medico.nome);
+			fprintf(temporario, "%s\n", cagendamento->filial.cnpj);
+			fprintf(temporario, "%s\n", cagendamento->filial.nome);
+			fprintf(temporario, "%s\n", cagendamento->data);
+			fprintf(temporario, "%s\n", cagendamento->hora);
+			fprintf(temporario, "%s\n", cagendamento->descricao);
+		}
+		else
+		{
+			test++;
+			printf("\n\nCodigo: %i\nCPF do paciente: %.3s.%.3s.%.3s-%.2s\nNome do paciente: %s\nCPF do medico: %.3s.%.3s.%.3s-%.2s\nNome do medico: %s\nCNPJ da filial: %.2s.%.3s.%.3s/%.4s-%.2s\nNome da Filial: %s\nData do agendamento: %.2s/%.2s/%.4s\nHora do Agendamento: %.2s:%.2s\nDescricao: %s\n", cagendamento->codigo, cagendamento->paciente.cpf, cagendamento->paciente.cpf+3, cagendamento->paciente.cpf+6, cagendamento->paciente.cpf+9, cagendamento->paciente.nome, cagendamento->medico.cpf, cagendamento->medico.cpf+3, cagendamento->medico.cpf+6, cagendamento->medico.cpf+9, cagendamento->medico.nome, cagendamento->filial.cnpj, cagendamento->filial.cnpj+2, cagendamento->filial.cnpj+5, cagendamento->filial.cnpj+8, cagendamento->filial.cnpj+12, cagendamento->filial.nome, cagendamento->data, cagendamento->data+2, cagendamento->data+4, cagendamento->hora, cagendamento->hora+2, cagendamento->descricao);			
+		}
+	}
+
+	while(cagendamento->save != 1 && 2 && test == 0)
+	{
+		printf("\n\n\nNao ha registros com esse CPF!\n\n");
+		fclose(pagendamento);
+		fclose(temporario);
+		printf("\n\nTecle [1] para tentar novamente ou [2] para VOLTAR ao menu de cadastro: ");
+		scanf("%i", &cagendamento->save);
+
+		switch (cagendamento->save)
+		{
+			case 1 : cancelar_agendamento(); break;	
+			case 2 : main_cadastro(); break;
+			default:printf("\nOpcao inexistente, tente novamente [1] ou [2].");	
+		}
+	}
+
+	while(cagendamento->save != 1 && 2)
+	{
+		printf("\n\nTecle [1] para confirmar o CANCELAMENTO desse agendamento ou [2] para VOLTAR ao menu de cadastro: ");
+		scanf("%i", &cagendamento->save);
+
+		switch (cagendamento->save)
+		{
+			case 1 : break;	
+			case 2 : main_cadastro(); break;
+			default:printf("\nOpcao inexistente, tente novamente [1] ou [2].");	
+		}
+		fclose(pagendamento);
+		fclose(temporario);
+
+		remove("dados\\cad_agendamento.txt");
+		rename("dados\\temporario_agen.txt", "dados\\cad_agendamento.txt");
+
+		printf("Tecle ENTER para voltar ao menu anterior!");
+		getchar();
+		main_delete();
+	}			
+}
+
+/*-----------------------------------------------------------------------*/
+
 /*FUNÇÕES*/
-int verifica_useradm(void)
+int verifica_useradm		(void)
 {
 	const char * buscar_adm = "admin";
 	char senha_adm[50];
@@ -1554,10 +1902,9 @@ int verifica_useradm(void)
 		}	
 	}
 	return 0;
-	free(usuario);
 }
 
-int tela_login(void)
+int tela_login				(void)
 {
 	int i, tam_msg;
 	char scan[50], scan2[50], crip_msg[50];
@@ -1620,7 +1967,7 @@ int tela_login(void)
     return 0;
 }
 
-void tratamento_desc50(char* tdesc50, int tdesc50_size)
+void tratamento_desc50		(char* tdesc50, int tdesc50_size)
 {
 	/*TRATAMENTO PARA NOME OU DESCRIÇÃO DE 50 CARACTERES*/
     int i;
@@ -1650,7 +1997,37 @@ void tratamento_desc50(char* tdesc50, int tdesc50_size)
 	}while(c != 13 || i == 0);
 }
 
-void tratamento_cpf(char* tcpf, int tcpf_size)
+void tratamento_estado		(char* testado, int testado_size)
+{
+	/*TRATAMENTO PARA O ESTADO*/
+    int i;
+    char c;
+
+	memset(testado, 0, testado_size);
+    i = 0;
+    c = '\0';
+
+	do
+	{
+		c = getch();
+		if (isprint(c) != 0)
+		{
+			if (i < 2)
+			{
+				testado[i] = c;
+				i++;
+				printf("%c", c);				
+			}
+		}else if (c == 8 && i)
+		{
+			testado[i] = '\0';
+			i--;
+			printf("\b \b");
+		}
+	}while(c != 13 || i == 0 || i < 2);
+}
+
+void tratamento_cpf			(char* tcpf, int tcpf_size)
 {
 	/*TRATAMENTO PARA O CPF*/
 
@@ -1697,7 +2074,7 @@ void tratamento_cpf(char* tcpf, int tcpf_size)
 	tcpf[i] = '\0';
 }
 
-void tratamento_data(char* tdata, int tdata_size)
+void tratamento_data		(char* tdata, int tdata_size)
 {
 	/*TRATAMENTO PARA A DATA*/
 
@@ -1741,7 +2118,7 @@ void tratamento_data(char* tdata, int tdata_size)
 	tdata[i] = '\0';
 }
 
-void tratamento_tdta(char* tdta, int tdta_size)
+void tratamento_tdta		(char* tdta, int tdta_size)
 {
 	int d, m, a;
 
@@ -1776,7 +2153,7 @@ void tratamento_tdta(char* tdta, int tdta_size)
 	}while (((d < data_hora_atual->tm_mday || d > 31 || d != data_hora_atual->tm_mday) && (m < data_hora_atual->tm_mon+1 || m > 12)) || (a < data_hora_atual->tm_year+1900));
 }
 
-void tratamento_hora(char* thora, int thora_size)
+void tratamento_hora		(char* thora, int thora_size)
 {
 	/*TRATAMENTO PARA A HORA*/
 
@@ -1820,7 +2197,7 @@ void tratamento_hora(char* thora, int thora_size)
 	thora[i] = '\0';
 }
 
-void tratamento_preco(int* tpreco)
+void tratamento_preco		(int* tpreco)
 {
 	/*TRATAMENTO PARA A HORA*/
 
@@ -1861,7 +2238,7 @@ void tratamento_preco(int* tpreco)
 	}while(c != 13 || i == 0);
 }
 
-void tratamento_hm(char* thm, int thm_size)
+void tratamento_hm			(char* thm, int thm_size)
 {
 	int h, m;
 
@@ -1882,7 +2259,7 @@ void tratamento_hm(char* thm, int thm_size)
 	}while (h > 23 || m > 59);
 }
 
-void tratamento_cnpj(char* tcnpj, int tcnpj_size)
+void tratamento_cnpj		(char* tcnpj, int tcnpj_size)
 {
 	int i;
     char c;
@@ -1929,7 +2306,7 @@ void tratamento_cnpj(char* tcnpj, int tcnpj_size)
 	}while(c != 13 || i == 0 || i < 14);
 }
 
-void tratamento_senha(char* tsenha, int tsenha_size)
+void tratamento_senha		(char* tsenha, int tsenha_size)
 {
 	/*TRATAMENTO PARA A SENHA*/
 	int i;
@@ -1960,7 +2337,7 @@ void tratamento_senha(char* tsenha, int tsenha_size)
 	} while (c != 13 || i == 0);
 }
 
-void tratamento_celular(char* tcelular, int tcelular_size)
+void tratamento_celular		(char* tcelular, int tcelular_size)
 {
 	/*TRATAMENTO PARA O CELULAR*/
     int i;
@@ -2006,7 +2383,7 @@ void tratamento_celular(char* tcelular, int tcelular_size)
 	}while(c != 13 || i == 0 || i < 11);
 }
 
-void tratamento_cep(char* tcep, int tcep_size)
+void tratamento_cep			(char* tcep, int tcep_size)
 {
 	/*TRATAMENTO PARA O CEP*/
     int i;
@@ -2049,7 +2426,7 @@ void tratamento_cep(char* tcep, int tcep_size)
 	}while(c != 13 || i == 0 || i < 8);
 }
 
-void incrementa_id_func(int *IDinc_func)
+void incrementa_id_func		(int *IDinc_func)
 {
 	puser = fopen("dados\\cad_funcionario.txt", "r");
 	if (puser == NULL) {
@@ -2078,7 +2455,7 @@ void incrementa_id_func(int *IDinc_func)
 	*IDinc_func = usuarioi->codigo;
 }
 
-void incrementa_id_paci(int *IDinc_paci)
+void incrementa_id_paci		(int *IDinc_paci)
 {
 	ppatient = fopen("dados\\cad_paciente.txt", "r");
 	if (ppatient == NULL) {
@@ -2107,7 +2484,7 @@ void incrementa_id_paci(int *IDinc_paci)
 	*IDinc_paci = pacientei->codigo;
 }
 
-void incrementa_id_medi(int *IDinc_medi)
+void incrementa_id_medi		(int *IDinc_medi)
 {
 	pdoctor = fopen("dados\\cad_medico.txt", "r");
 	if (pdoctor == NULL) {
@@ -2136,7 +2513,7 @@ void incrementa_id_medi(int *IDinc_medi)
 	*IDinc_medi = medicoi->codigo;
 }
 
-void incrementa_id_fili(int *IDinc_fili)
+void incrementa_id_fili		(int *IDinc_fili)
 {
 	pfilial = fopen("dados\\cad_filial.txt", "r");
 	if (pfilial == NULL) {
@@ -2165,7 +2542,7 @@ void incrementa_id_fili(int *IDinc_fili)
 	*IDinc_fili = filiali->codigo;
 }
 
-void incrementa_id_agen(int *IDinc_agen)
+void incrementa_id_agen		(int *IDinc_agen)
 {
 	pagendamento = fopen("dados\\cad_agendamento.txt", "r");
 	if (pagendamento == NULL) {
@@ -2194,7 +2571,7 @@ void incrementa_id_agen(int *IDinc_agen)
 	*IDinc_agen = agendamentoi->codigo;
 }
 
-void criptografa_senha(char *crip_msg, int senha_encript_size)
+void criptografa_senha		(char *crip_msg, int senha_encript_size)
 {
 	int i, tam_msg = 0;
 	char senha_cript[50], c;
