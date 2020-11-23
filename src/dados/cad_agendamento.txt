@@ -1,0 +1,44 @@
+2
+13131313131
+caio carvalho de matos
+17171717171
+lucas batista lemos
+99999999999999
+clinica a
+02032021
+1530
+200,000000
+descricao ficticia
+3
+14141414141
+pedro henrique moreira
+18181818181
+mateus borba gutierrez
+88888888888888
+clinica b
+03022021
+0930
+100,000000
+descricao ficticia
+4
+15151515151
+angelica de lima
+18181818181
+mateus borba gutierrez
+88888888888888
+clinica b
+20012021
+1000
+200,000000
+descricao ficticia
+5
+16161616161
+carol oliveira silva santos
+19191919191
+alex araujo do nascimento
+77777777777777
+clinica c
+28022021
+1400
+1000,000000
+descricao ficticia
