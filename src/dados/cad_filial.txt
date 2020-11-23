@@ -1,0 +1,30 @@
+1
+clinica a
+99999999999999
+descricao ficticia
+SP
+cidade ficticia a
+bairro ficticio a
+logradouro ficticio a
+complemento ficticio a
+99999999
+2
+clinica b
+88888888888888
+descricao ficticia b
+MG
+cidade ficticia b
+bairro ficticio b
+logradouro ficticio b
+complemento ficticio b
+88888888
+3
+clinica c
+77777777777777
+descricao ficticia c
+RJ
+cidade ficticia c
+bairro ficticio c
+logradouro ficticio c
+complemento ficticio c
+77777777

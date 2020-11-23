@@ -1,0 +1,39 @@
+1
+lucas batista lemos
+11917171717
+lucablemos@yahoo.com
+17171717171
+ortopedista
+99999999999999
+SP
+cidade ficticia
+bairro ficticio
+logradouro ficticio
+complemento ficticio
+17171717
+2
+mateus borba gutierrez
+11918181818
+matuja_varg@hotmail.com
+18181818181
+neurologia
+88888888888888
+MG
+cidade ficticia
+bairro ficticio
+logradouro ficticio
+complemento ficticio
+18181818
+3
+alex araujo do nascimento
+11919191919
+salessarauuj@hotmai.com
+19191919191
+Oftalmologia
+77777777777777
+RJ
+cidade ficticia
+bairro ficticio
+logradouro ficticio
+complemento ficticio
+19191919
