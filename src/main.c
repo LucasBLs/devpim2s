@@ -7409,3 +7409,5 @@ void criptografa_senha(char *crip_msg, int senha_encript_size)
 	}
 	crip_msg[tam_msg] = '\0';
 }
+
+/*Finish*/
